@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "local:dev": "env-cmd -f .env.local next dev",
     "build": "next build",
     "start": "next start",
     "local:build": "env-cmd -f .env.local next build",
