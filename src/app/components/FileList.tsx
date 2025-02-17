@@ -92,41 +92,50 @@ export default function FileList() {
       ) : (
         <div className="w-full max-w-md mx-auto">
           {/* add search bar here to search for files   */}
-          <div className="bg-gray-50 dark:bg-gray-800 dark:text-gray-400 p-2">
+          <div className="w-full max-w-md mx-auto bg-gray-50 dark:bg-gray-800 dark:text-gray-400 p-2">
             <label className="text-sm text-gray-700 dark:text-gray-400">
               Search Files:
             </label>
-            <input
-              type="text"
-              className="border border-gray-300 dark:border-gray-700 p-1 rounded-md"
-              placeholder="Search files..."
-              onChange={(e) => {
-                setSearchQuery({ ...searchQuery, filename: e.target.value });
-              }}
-            />
-            {/* text box to type extensions to search for */}
-            <input
-              type="text"
-              className="border border-gray-300 dark:border-gray-700 p-1 rounded-md"
-              placeholder="Extensions..., e.g. pdf, docx"
-              onChange={(e) => {
-                setSearchQuery({
-                  ...searchQuery,
-                  extensions: e.target.value
-                    .split(",")
-                    .map((ext) => ext.trim()),
-                });
-              }}
-            />
-            <button
-              className="bg-blue-500 text-white p-1 rounded-md ml-2"
-              onClick={searchFiles}
-            >
-              Search
-            </button>
-            <button className="bg-blue-500 text-white p-1 rounded-md ml-2" onClick={resetSearch}>
-              Reset
-            </button>
+            <br />
+            <div className="text-sm text-gray-700 dark:text-gray-400 px-2 w-full max-w-md mx-auto">
+              <input
+                type="text"
+                className="border border-gray-300 dark:border-gray-700 p-1 rounded-md"
+                placeholder="Search files..."
+                onChange={(e) => {
+                  setSearchQuery({ ...searchQuery, filename: e.target.value });
+                }}
+              />
+              {/* text box to type extensions to search for */}
+              <input
+                type="text"
+                className="border border-gray-300 dark:border-gray-700 p-1 rounded-md"
+                placeholder="Extensions..., e.g. pdf, docx"
+                onChange={(e) => {
+                  setSearchQuery({
+                    ...searchQuery,
+                    extensions: e.target.value
+                      .split(",")
+                      .map((ext) => ext.trim()),
+                  });
+                }}
+              />
+            </div>
+            <br />
+            <div className="w-full max-w-md max-auto text-sm text-gray-700 dark:text-gray-400">
+              <button
+                className="bg-blue-500 text-white p-1 rounded-md ml-2"
+                onClick={searchFiles}
+              >
+                Search
+              </button>
+              <button
+                className="bg-blue-500 text-white p-1 rounded-md ml-2"
+                onClick={resetSearch}
+              >
+                Reset
+              </button>
+            </div>
           </div>
           <hr />
           {/* show total number of files */}
@@ -165,57 +174,62 @@ export default function FileList() {
           </div>
           <hr />
           {/* Table to display files */}
-          <table className="min-w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-4 py-2 md:px-6 md:py-3">
-                  File Name
-                </th>
-                <th scope="col" className="px-4 py-2 md:px-6 md:py-3">
-                  Size
-                </th>
-                <th scope="col" className="px-4 py-2 md:px-6 md:py-3">
-                  Created At
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {files.map((file) => (
-                <tr
-                  key={file.filename}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
-                >
-                  <td
-                    scope="row"
-                    className="px-4 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    <a href={`${downloadApi}/${file.filename}`}>
-                      {file.filename}
-                    </a>
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-4 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    {file.size
-                      ? `${(file.size / 1024 / 1024).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })} MB`
-                      : "-"}
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-4 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    {file.createdAt
-                      ? new Date(file.createdAt).toLocaleString()
-                      : "-"}
-                  </td>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th scope="col" className="px-4 py-2 md:px-6 md:py-3">
+                    File Name
+                  </th>
+                  <th scope="col" className="px-4 py-2 md:px-6 md:py-3">
+                    Size
+                  </th>
+                  <th scope="col" className="px-4 py-2 md:px-6 md:py-3">
+                    Created At
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {files.map((file) => (
+                  <tr
+                    key={file.filename}
+                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
+                  >
+                    <td
+                      scope="row"
+                      className="px-4 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      <a href={`${downloadApi}/${file.filename}`}>
+                        {file.filename}
+                      </a>
+                    </td>
+                    <td
+                      scope="row"
+                      className="px-4 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      {file.size
+                        ? `${(file.size / 1024 / 1024).toLocaleString(
+                            undefined,
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            },
+                          )} MB`
+                        : "-"}
+                    </td>
+                    <td
+                      scope="row"
+                      className="px-4 py-2 md:px-6 md:py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      {file.createdAt
+                        ? new Date(file.createdAt).toLocaleString()
+                        : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
