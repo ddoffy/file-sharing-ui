@@ -21,15 +21,15 @@ const nextConfig: NextConfig = {
       use: ["@svgr/webpack"],
     });
 
-    // if (!dev && !isServer) {
-    //   config.optimization.minimizer.forEach((minimizer) => {
-    //     if (minimizer.constructor.name === "TerserPlugin") {
-    //       // Enable Terser option to drop console statements
-    //       minimizer.options.terserOptions.compress.drop_console = true;
-    //     }
-    //   });
-    // }
-    //
+    if (!dev && !isServer) {
+      config.optimization.minimizer.forEach((minimizer) => {
+        if (minimizer.constructor.name === "TerserPlugin") {
+          // Enable Terser option to drop console statements
+          minimizer.options.terserOptions.compress.drop_console = true;
+        }
+      });
+    }
+
     return config;
   },
 
@@ -59,8 +59,8 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/clipboard/room_id=:room_id&room_name=:room_name",
-        destination: "/clipboard-contents",
-      }
+        destination: "/clipboard-page",
+      },
     ];
   },
 };

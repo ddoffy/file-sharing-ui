@@ -1,17 +1,19 @@
-"use client";
+"use client"
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import Clipboard from "../components/Clipboard";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default function ClipboardContents() {
+function ClipboardContents() {
   const searchParams = useSearchParams();
   const room_id = decodeURIComponent(searchParams.get("room_id"));
   const room_name = decodeURIComponent(searchParams.get("room_name"));
-  console.log("room_id", room_id);
-  console.log("room_name", room_name);
-  console.log("searchParams", searchParams);
+
+  if (!room_id || !room_name) {
+    return <p>Invalid room</p>;
+  }
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -43,4 +45,12 @@ export default function ClipboardContents() {
       </footer>
     </div>
   );
+}
+
+export default function ClipboardPage() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <ClipboardContents />
+    </Suspense>
+    )
 }
