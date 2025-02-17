@@ -28,9 +28,9 @@ all: build-both stop-both remove-both run-both
 
 .PHONY: build-ui build-ui-local stop-ui stop-ui-local remove-ui remove-ui-local run-ui run-ui-local
 
-// What is the use of .PHONY in makefile?
-// .PHONY is a special target in makefile that is used to declare a target that does not represent a file.
-// When you run make, it checks if the target is a file and if it is up to date. If it is not a file, it will always run the target.
-// This is useful for targets that do not represent files, such as clean, build, run, etc.
-// By declaring a target as .PHONY, you ensure that make will always run the target, even if there is a file with the same name.
-// This is useful for targets that are used to run commands, such as build, run, clean, etc.
+#  What is the use of .PHONY in makefile?
+#  .PHONY is a special target in makefile that is used to declare a target that does not represent a file.
+#  When you run make, it checks if the target is a file and if it is up to date. If it is not a file, it will always run the target.
+#  This is useful for targets that do not represent files, such as clean, build, run, etc.
+#  By declaring a target as .PHONY, you ensure that make will always run the target, even if there is a file with the same name.
+#  This is useful for targets that are used to run commands, such as build, run, clean, etc.
