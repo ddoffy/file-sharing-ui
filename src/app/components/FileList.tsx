@@ -90,7 +90,7 @@ export default function FileList() {
       {files.length === 0 && !loading ? (
         <p>No files uploaded yet.</p>
       ) : (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full max-w-md mx-auto">
           {/* add search bar here to search for files   */}
           <div className="bg-gray-50 dark:bg-gray-800 dark:text-gray-400 p-2">
             <label className="text-sm text-gray-700 dark:text-gray-400">

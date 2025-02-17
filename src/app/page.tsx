@@ -90,6 +90,12 @@ export default function Home() {
           <Link href="/file-list" passHref className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
             View Uploaded Files
           </Link>
+          <br/>
+          <Link href="/clipboard-rooms" passHref className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+            Go to Clipboard Rooms
+          </Link>
+
+
         </div>
       </footer>
     </div>
