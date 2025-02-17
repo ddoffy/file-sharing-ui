@@ -11,6 +11,8 @@ interface FileItem {
 interface SearchQuery {
   filename: string;
   extensions: string[];
+  page?: number;
+  limit?: number;
 }
 
 export default function FileList() {
@@ -20,13 +22,14 @@ export default function FileList() {
   const [searchQuery, setSearchQuery] = useState<SearchQuery>({
     filename: "",
     extensions: [],
+    page: 0,
+    limit: 100,
   });
 
-  const listFilesApi = (process.env.FILE_SERVER_API || "") + "/api/files";
   const downloadApi = (process.env.FILE_SERVER_API || "") + "/api/download";
   const searchFilesApi = (process.env.FILE_SERVER_API || "") + "/api/search";
 
-  async function searchFiles() {   
+  async function searchFiles() {
     setLoading(true);
     setError(null);
     try {
@@ -55,31 +58,27 @@ export default function FileList() {
     }
   }
 
-  async function fetchFiles() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(listFilesApi); // Adjust this URL to match your API endpoint.
-      if (!res.ok) {
-        throw new Error(`Error fetching files: ${res.statusText}`);
-      }
-      const jsonData = await res.json();
-      const data = jsonData.map((item: any) => ({
-        filename: item.filename,
-        size: item.size,
-        createdAt: item.created_at,
-        // Add more fields here if needed
-      }));
-      setFiles(data);
-    } catch (err: any) {
-      setError(err.message || "Unknown error");
-    } finally {
-      setLoading(false);
+  async function resetSearch() {
+    setSearchQuery({ filename: "", extensions: [], page: 0, limit: 100 });
+    searchFiles();
+  }
+
+  async function previousPage() {
+    if (searchQuery.page && searchQuery.page > 1) {
+      setSearchQuery({ ...searchQuery, page: (searchQuery.page || 1) - 1 });
+      searchFiles();
+    }
+  }
+
+  async function nextPage() {
+    if (files.length > searchQuery.page * searchQuery.limit) {
+      setSearchQuery({ ...searchQuery, page: (searchQuery.page || 1) + 1 });
+      searchFiles();
     }
   }
 
   useEffect(() => {
-    fetchFiles();
+    searchFiles();
   }, []);
 
   return (
@@ -113,20 +112,59 @@ export default function FileList() {
               onChange={(e) => {
                 setSearchQuery({
                   ...searchQuery,
-                  extensions: e.target.value.split(",").map((ext) => ext.trim()),
+                  extensions: e.target.value
+                    .split(",")
+                    .map((ext) => ext.trim()),
                 });
-              }
-              }
+              }}
             />
-            <button className="bg-blue-500 text-white p-1 rounded-md ml-2" onClick={searchFiles}>
+            <button
+              className="bg-blue-500 text-white p-1 rounded-md ml-2"
+              onClick={searchFiles}
+            >
               Search
             </button>
+            <button className="bg-blue-500 text-white p-1 rounded-md ml-2" onClick={resetSearch}>
+              Reset
+            </button>
           </div>
+          <hr />
+          {/* show total number of files */}
           <div className="bg-gray-50 dark:bg-gray-800 dark:text-gray-400 p-2">
             <p className="text-sm text-gray-700 dark:text-gray-400">
               Total files: {files.length}
             </p>
           </div>
+          <hr />
+          {/* add pagination here to show files in pages of 100 */}
+          <div className="bg-gray-50 dark:bg-gray-800 dark:text-gray-400 p-2">
+            <p className="text-sm text-gray-700 dark:text-gray-400">
+              Showing {searchQuery.limit} files per page
+            </p>
+            <p className="text-sm text-gray-700 dark:text-gray-400">
+              Page: {searchQuery.page || 1} of{" "}
+              {Math.ceil(files.length / searchQuery.limit)}
+            </p>
+            {/* add next and previous buttons here to navigate through pages */}
+            {searchQuery.page > 1 && (
+              <button
+                className="bg-blue-500 text-white p-1 rounded-md ml-2"
+                onClick={previousPage}
+              >
+                Previous
+              </button>
+            )}
+            {files.length > (searchQuery.page + 1) * searchQuery.limit && (
+              <button
+                className="bg-blue-500 text-white p-1 rounded-md ml-2"
+                onClick={nextPage}
+              >
+                Next
+              </button>
+            )}
+          </div>
+          <hr />
+          {/* Table to display files */}
           <table className="min-w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
@@ -180,16 +218,6 @@ export default function FileList() {
           </table>
         </div>
       )}
-      <button
-        onClick={fetchFiles}
-        style={{
-          marginTop: "1rem",
-          textDecoration: "underline",
-          color: "yellow",
-        }}
-      >
-        Refresh List
-      </button>
     </div>
   );
 }
