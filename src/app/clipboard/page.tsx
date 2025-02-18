@@ -1,12 +1,17 @@
-"use client"
+"use client";
 
 import React from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Clipboard from "../components/Clipboard";
 import Link from "next/link";
 import { Suspense } from "react";
+import { useWebSocket  } from '../context/WebSocketContext';
 
 function ClipboardContents() {
+  
+  const { sendMessage, messages } = useWebSocket();
+
   const searchParams = useSearchParams();
   const room_id = decodeURIComponent(searchParams.get("room_id"));
   const room_name = decodeURIComponent(searchParams.get("room_name"));
@@ -15,9 +20,21 @@ function ClipboardContents() {
     return <p>Invalid room</p>;
   }
 
+  useEffect(() => {
+    sendMessage(`joined ${room_id}`);
+  }, [room_id]);
+
   return (
     <div className="w-full max-w-md mx-auto">
       <main className="min-w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <div className="flex flex-col gap-2">
+          {messages.map((message, index) => (
+            <div key={index} className="flex gap-2">
+              <span className="font-bold">Server:</span>
+              <span>{message}</span>
+            </div>
+          ))}
+        </div>
         <div className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
           <Link
             href="/clipboard-rooms"

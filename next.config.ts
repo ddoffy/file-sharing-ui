@@ -38,10 +38,11 @@ const nextConfig: NextConfig = {
   // swcMinify: true, // Enable SWC minification - this is invalid settings
   compiler: {
     // Remove all console.* calls in production
-    removeConsole: true,
+    // removeConsole: true,
   },
   env: {
     FILE_SERVER_API: process.env.FILE_SERVER_API || "/",
+    WEB_SOCKET_SERVER: process.env.WEB_SOCKET_SERVER || "ws://localhost:8080/ws",
   },
   rewrites: async () => {
     return [

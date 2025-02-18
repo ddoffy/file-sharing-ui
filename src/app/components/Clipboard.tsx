@@ -2,8 +2,12 @@
 
 import React from "react";
 import { useEffect, useState } from "react";
+import { useWebSocket } from "../context/WebSocketContext";
 
 export default function Clipboard(props: { room_id: string, room_name: string }) {
+  
+  const { sendMessage, messages } = useWebSocket();
+
   // we get the room id from props of the component
   const { room_id, room_name } = props;
   const storeClipboardApi =
@@ -47,6 +51,7 @@ export default function Clipboard(props: { room_id: string, room_name: string })
       setClipboardText("");
       // get the updated clipboard items
       getClipboard();
+      sendMessage(room_id);
     } catch (err: any) {
       setError(err.message || "Unknown error");
       console.error(err.message || "Unknown error");
@@ -79,7 +84,20 @@ export default function Clipboard(props: { room_id: string, room_name: string })
   // load the clipboard items on component mount
   useEffect(() => {
     getClipboard();
-  }, []);
+    handleStateChange(messages.at(-1));
+  }, [messages]);
+
+  // handle state change
+  const handleStateChange = (msg: any) => {
+    console.log("handleStateChange: ", msg);
+    if (msg && !msg.startsWith("joined")) {
+      console.log("msg + room_id: ", msg, room_id);
+      if (msg == room_id) {
+        console.log("refreshing clipboard");
+        getClipboard();
+      }
+    }
+  };
 
   return (
     <div className="w-full max-w-md mx-auto">
