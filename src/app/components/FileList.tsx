@@ -11,12 +11,24 @@ interface FileItem {
 interface SearchQuery {
   filename: string;
   extensions: string[];
-  page?: number;
-  limit?: number;
+  page: number;
+  limit: number;
+}
+
+interface SearchResult {
+  files: FileItem[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export default function FileList() {
-  const [files, setFiles] = useState<FileItem[]>([]);
+  const [searchResult, setSearchResult] = useState<SearchResult>({
+    files: [],
+    total: 0,
+    page: 0,
+    limit: 100,
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<SearchQuery>({
@@ -29,7 +41,7 @@ export default function FileList() {
   const downloadApi = (process.env.FILE_SERVER_API || "") + "/api/download";
   const searchFilesApi = (process.env.FILE_SERVER_API || "") + "/api/search";
 
-  async function searchFiles() {
+  async function searchFiles(query: SearchQuery) {
     setLoading(true);
     setError(null);
     try {
@@ -38,19 +50,13 @@ export default function FileList() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(searchQuery),
+        body: JSON.stringify(query),
       });
       if (!res.ok) {
         throw new Error(`Error searching files: ${res.statusText}`);
       }
       const jsonData = await res.json();
-      const data = jsonData.map((item: any) => ({
-        filename: item.filename,
-        size: item.size,
-        createdAt: item.created_at,
-        // Add more fields here if needed
-      }));
-      setFiles(data);
+      setSearchResult(jsonData);
     } catch (err: any) {
       setError(err.message || "Unknown error");
     } finally {
@@ -60,26 +66,32 @@ export default function FileList() {
 
   async function resetSearch() {
     setSearchQuery({ filename: "", extensions: [], page: 0, limit: 100 });
-    searchFiles();
+    searchFiles(searchQuery);
   }
 
   async function previousPage() {
-    if (searchQuery.page && searchQuery.page > 1) {
-      setSearchQuery({ ...searchQuery, page: (searchQuery.page || 1) - 1 });
-      searchFiles();
-    }
+    setSearchQuery((previousQuery) => ({
+      ...previousQuery,
+      page: previousQuery.page - 1,
+    }));
+    console.log("searchQuery", searchQuery);
+    searchFiles(searchQuery);
   }
 
   async function nextPage() {
-    if (files.length > searchQuery.page * searchQuery.limit) {
-      setSearchQuery({ ...searchQuery, page: (searchQuery.page || 1) + 1 });
-      searchFiles();
+    if (searchResult.total > searchQuery.page * searchQuery.limit) {
+      setSearchQuery((previousQuery) => ({
+        ...previousQuery,
+        page: previousQuery.page + 1,
+      }));
+      console.log("searchQuery", searchQuery);
+      searchFiles(searchQuery);
     }
   }
 
   useEffect(() => {
-    searchFiles();
-  }, []);
+    searchFiles(searchQuery);
+  }, [searchQuery]);
 
   return (
     <div>
@@ -87,7 +99,7 @@ export default function FileList() {
       <hr />
       {loading && <p>Loading files...</p>}
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {files.length === 0 && !loading ? (
+      {searchResult.files.length === 0 && !loading ? (
         <p>No files uploaded yet.</p>
       ) : (
         <div className="w-full max-w-md mx-auto">
@@ -125,7 +137,7 @@ export default function FileList() {
             <div className="w-full max-w-md max-auto text-sm text-gray-700 dark:text-gray-400">
               <button
                 className="bg-blue-500 text-white p-1 rounded-md ml-2"
-                onClick={searchFiles}
+                onClick={() => searchFiles(searchQuery)}
               >
                 Search
               </button>
@@ -141,7 +153,7 @@ export default function FileList() {
           {/* show total number of files */}
           <div className="bg-gray-50 dark:bg-gray-800 dark:text-gray-400 p-2">
             <p className="text-sm text-gray-700 dark:text-gray-400">
-              Total files: {files.length}
+              Total files: {searchResult.total}
             </p>
           </div>
           <hr />
@@ -151,26 +163,27 @@ export default function FileList() {
               Showing {searchQuery.limit} files per page
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-400">
-              Page: {searchQuery.page || 1} of{" "}
-              {Math.ceil(files.length / searchQuery.limit)}
+              Page: {searchQuery.page + 1} of{" "}
+              {Math.ceil(searchResult.total / searchQuery.limit)}
             </p>
             {/* add next and previous buttons here to navigate through pages */}
-            {searchQuery.page > 1 && (
+            {
               <button
                 className="bg-blue-500 text-white p-1 rounded-md ml-2"
                 onClick={previousPage}
+                disabled={searchQuery.page === 0}
               >
                 Previous
               </button>
-            )}
-            {files.length > (searchQuery.page + 1) * searchQuery.limit && (
+            }
+            {
               <button
                 className="bg-blue-500 text-white p-1 rounded-md ml-2"
                 onClick={nextPage}
               >
                 Next
               </button>
-            )}
+            }
           </div>
           <hr />
           {/* Table to display files */}
@@ -190,7 +203,7 @@ export default function FileList() {
                 </tr>
               </thead>
               <tbody>
-                {files.map((file) => (
+                {searchResult.files.map((file) => (
                   <tr
                     key={file.filename}
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
