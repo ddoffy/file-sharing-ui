@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "local:dev": "env-cmd -f .env.local next dev",
-    "build": "next build",
-    "start": "next start",
+    "build": "env-cmd -f .env next build",
+    "start": "env-cmd -f .env next start",
     "local:build": "env-cmd -f .env.local next build",
     "local:start": "env-cmd -f .env.local next start -H 0.0.0.0 -p 3001",
     "lint": "next lint",
