@@ -98,9 +98,6 @@ export default function FileList() {
     searchFiles(searchQuery);
   }, [searchQuery]);
 
-  // string of extensions to search for
-  const stringExtensions = searchQuery.extensions.join(", ");
-
   return (
     <div>
       <p>Click on a file to download:</p>
