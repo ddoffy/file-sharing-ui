@@ -18,11 +18,14 @@ logs-ui:
 	sudo docker logs -f file-sharing-ui
 logs-ui-local:
 	sudo docker logs -f file-sharing-ui-local
+deploy-local: build-ui-local stop-ui-local remove-ui-local run-ui-local
+deploy: build-ui stop-ui remove-ui run-ui
 build-both: build-ui build-ui-local
 run-both: run-ui run-ui-local
 stop-both: stop-ui stop-ui-local
 remove-both: remove-ui remove-ui-local
 logs-both: logs-ui logs-ui-local
+deploy-both: deploy deploy-local
 all: build-both stop-both remove-both run-both
 
 
